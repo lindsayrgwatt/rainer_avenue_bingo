@@ -4,4 +4,7 @@ __pycache__/
 
 .DS_Store
 
+rainier_valley.xcf
+bingo_card_*
+
 venv/

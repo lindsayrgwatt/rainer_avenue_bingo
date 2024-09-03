@@ -6,11 +6,11 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from reportlab.lib.units import inch
 
 CARD_SIZE = 5
 
 pdfmetrics.registerFont(TTFont('OldLondon', 'OldLondon.ttf'))
-pdfmetrics.registerFont(TTFont('Garamond', 'AppleGaramond.ttf'))
 
 # Methods to Generate Bingo Card Elements
 
@@ -36,6 +36,10 @@ def generate_bingo_cards(items, num_cards):
 def create_pdf_for_card(card, filename, items):
     c = canvas.Canvas(filename, pagesize=letter)
     width, height = letter
+    
+    # Background image
+    background_image_path = 'rainier_valley.png'
+    c.drawImage(background_image_path, 0, 0, width=width, height=height)
     
     # Header
     header_text = 'Rainier Avenue'
@@ -120,6 +124,7 @@ def create_pdf_for_card(card, filename, items):
     table = Table(data, colWidths=cell_width, rowHeights=cell_height)
     
     table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('BOX', (0, 0), (-1, -1), 1, colors.black)
@@ -140,15 +145,16 @@ def create_pdf_for_card(card, filename, items):
             c.rect(x1, y1, cell_width, cell_height)    
     
     # Footer
-    footer_text_1 = "<para>Celebrating the things that make the Valley, <i>the Valley</i>.</para>"
-    footer_text_2 = """<para>Feedback // Tile ideas // Shade <font name="Courier">@rainier_valley_bingo</font> (IG)</para>"""
+    footer_text_1 = "<para><b>Celebrating the things that make the Valley, <i>the Valley</i>.</b></para>"
+    footer_text_2 = """<para><b>Feedback // Tile ideas // Shade <font name="Courier">@rainier_valley_bingo</font> (IG)</b></para>"""
 
     footer_style = ParagraphStyle(
         name='FooterStyle',
         parent=styles['Normal'],
         fontName='Times-Roman',
+        backColor=colors.white,
         fontSize=12,
-        alignment=0,
+        alignment=1,
         spaceBefore=0,
         spaceAfter=0,
         leading=16
@@ -163,13 +169,13 @@ def create_pdf_for_card(card, filename, items):
     y = 180 # 8 inches down page
     footer_width = width - 2 * x
 
-    footer_1.wrapOn(c, header_width, header_height)
+    footer_1.wrapOn(c, footer_width, footer_height)
     footer_1.drawOn(c, x, y)
     
     footer_2 = Paragraph(footer_text_2, footer_style)
     y = 160
 
-    footer_2.wrapOn(c, header_width, header_height)
+    footer_2.wrapOn(c, footer_width, footer_height)
     footer_2.drawOn(c, x, y)
     
     # Unused tiles
@@ -179,9 +185,12 @@ def create_pdf_for_card(card, filename, items):
         fontName='Times-Roman',
         fontSize=8,
         alignment=0,
-        spaceBefore=0,
-        spaceAfter=0,
-        leading=10
+        leading=10,
+        backColor=colors.white,
+        leftIndent=6,  # Left padding
+        rightIndent=6,  # Right padding
+        spaceBefore=0.5 * inch,  # Top padding
+        spaceAfter=0.5 * inch,  # Bottom padding
     )
     
     
